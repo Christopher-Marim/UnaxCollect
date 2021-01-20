@@ -65,7 +65,7 @@ export default function AddList() {
       transparent={true}
       visible={statusModal}
       onRequestClose={closeModal}
-      animationType="slide">
+      animationType="fade">
       <View
         style={{
           flex: 1,

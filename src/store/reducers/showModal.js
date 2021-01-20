@@ -5,6 +5,7 @@ const inicialState = {
   showModalEDTITEM: false,
   showModalELLIPSIS: false,
   showModalFILTERCOLLECT: false,
+  showModalEDTAPI: false,
 
 };
 
@@ -39,6 +40,16 @@ const reducer = (state = inicialState, action) => {
       return {
         ...state,
         showModalEDTITEM: false,
+      };
+    case 'SHOW_MODAL_EDTAPI_ON':
+      return {
+        ...state,
+        showModalEDTAPI: true,
+      };
+    case 'SHOW_MODAL_EDTAPI_OFF':
+      return {
+        ...state,
+        showModalEDTAPI: false,
       };
       case 'SHOW_MODAL_ADDITEM_ON':
         return {

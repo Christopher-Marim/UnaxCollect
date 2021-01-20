@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-
+import React,{useEffect} from "react";
+import { useState } from "react";
 import {
   View,
   Modal,
@@ -10,44 +10,60 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import commonStyles from "../../commonStyles";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import getRealm from "../../services/realm";
-
-export default function AddList() {
-  const [collectName, setCollectName] = useState("");
+export default function EditAPI() {
+  const [ApiText, setApiText] = useState("");
+  const [ValueText, setValueText] = useState(null);
   const statusModal = useSelector(
-    (state) => state.showModal.showModalADDCOLLECT
+    (state) => state.showModal.showModalEDTAPI
   );
 
   const dispatch = useDispatch();
 
-  async function addCollect() {
-    if (!collectName || !collectName.trim()) {
-      Alert.alert("Dados Inválidos", "Descrição não Informada!");
+  function edtAPI() {
+    if (!ApiText || !ApiText.trim()) {
+      Alert.alert("Dados Invalidos", "Descrição não Informada!");
       return;
     } else {
-      const realm = await getRealm();
-
-      realm.write(() => {
-        realm.create("Collects", {
-          id: Math.random() * 1000,
-          nome: collectName,
-          dateAt: new Date(),
-          itens: [],
-        });
-        setCollectName();
-        dispatch({ type: "REFRESH", payload: [true] });
-        setInterval(() => {
-          dispatch({ type: "REFRESH", payload: [false] });
-        }, 1000);
-        closeModal();
-      });
+      UpdateAPI();
+      closeModal();
     }
   }
+  useEffect(()=>{
+    getData()
+  },[])
+  const getData = async () => {
+    try {
+      const apiText = await AsyncStorage.getItem('@API')
+      const apiValue = await AsyncStorage.getItem('@Value')
+     
+      if(apiText !== null) {
+        setApiText(apiText)
+        setValueText(apiValue)
+      }
+    } catch(e) {
+      // error reading value
+    }
+  }
+
+  async function UpdateAPI() {
+    try {
+      await AsyncStorage.setItem('@API', ApiText)
+      await AsyncStorage.setItem('@Value', ValueText)
+    } catch (e) {
+      // saving error
+    }
+
+  }
   function closeModal() {
-    dispatch({ type: "SHOW_MODAL_ADDCOLLECT_OFF" });
+    dispatch({ type: "SHOW_MODAL_EDTAPI_OFF" });
+    dispatch({ type: "REFRESH", payload: [true] });
+    setInterval(() => {
+      dispatch({ type: "REFRESH", payload: [false] });
+    }, 1000);
   }
 
   return (
@@ -68,19 +84,32 @@ export default function AddList() {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <View style={styles.container}>
-          <Text style={styles.headerModal}>Nova Coleta</Text>
+          <Text style={styles.headerModal}> Editar API</Text>
+          <Text style={styles.text}>Api</Text>
           <TextInput
             style={styles.input}
-            placeholder="Informe a Descrição"
-            onChangeText={(text) => setCollectName(text)}
-            value={collectName}
+            placeholder="Informe a BaseURL"
+            onChangeText={(text) => setApiText(text)}
+            value={ApiText}
+            autoCorrect={false}
+          />
+          
+          <Text style={styles.text}>Header Value </Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Informe o Value"
+            onChangeText={(text) => setValueText(text)}
+            value={ValueText}
+            autoCorrect={false}
+
           />
 
           <View style={styles.buttons}>
             <TouchableOpacity onPress={closeModal}>
               <Text style={styles.button}>Cancelar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={addCollect}>
+            <TouchableOpacity onPress={edtAPI}>
               <Text style={styles.button}>Salvar</Text>
             </TouchableOpacity>
           </View>
@@ -114,20 +143,27 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
+  text:{
+    marginTop: 10,
+    fontFamily: commonStyles.fontFamily,
+    fontWeight: commonStyles.fontWeight,
+    fontSize: 14,
+    paddingLeft:20
+  },
   buttons: {
     flexDirection: "row",
     justifyContent: "flex-end",
   },
   button: {
-    fontWeight: commonStyles.fontWeight,
     margin: 20,
     marginRight: 30,
     color: commonStyles.color.today,
+    fontWeight: commonStyles.fontWeight,
   },
   input: {
     fontFamily: commonStyles.fontFamily,
-    fontWeight: commonStyles.fontWeight,
     paddingHorizontal: 5,
+    fontWeight: commonStyles.fontWeight,
     height: 40,
     marginTop: 10,
     margin: 15,

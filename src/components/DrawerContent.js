@@ -73,13 +73,13 @@ export default (props) => {
                 <DrawerItem 
                     icon={({color, size}) => (
                         <MaterialCommunityIcons 
-                        name="settings-outline" 
+                        name="database-settings" 
                         color={color}
                         size={size}
                         />
                     )}
                     label="Configurações"
-                    onPress={() => {props.navigation.navigate('')}}
+                    onPress={() => {props.navigation.navigate('Configs')}}
                 />
                 <DrawerItem 
                     icon={({color, size}) => (
@@ -90,7 +90,7 @@ export default (props) => {
                         />
                     )}
                     label="Support"
-                    onPress={() => {props.navigation.navigate('')}}
+                    onPress={() => {}}
                 />
             </Drawer.Section>
            

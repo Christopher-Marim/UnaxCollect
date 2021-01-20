@@ -1,27 +1,50 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Vibration } from "react-native";
 import moment from "moment";
 import "moment/locale/pt-br";
 import { useSelector, useDispatch } from "react-redux";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import commonStyles from "../commonStyles";
 import Icon from "react-native-vector-icons/FontAwesome";
+import axios from 'axios'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import api from "../services/api";
+
 import getRealm from "../services/realm";
 
 export default function Collect(props) {
   const [borderRadiusCONST, setborderRadius] = useState(10);  
   const [collects, setCollects] = useState([]);
-
+  const [BaseURL, setBaseURL] = useState('');
+  const [HeaderKey, setHeaderKey] = useState('');
+  const [HeaderValue, setHeaderValue] = useState('');
   const dispatch = useDispatch();
 
   const formatteddate = (collects) =>
     moment(collects.dateAt).locale("pt-br").format("D/MM/YYYY");
     
+    const getData = async () => {
+      try {
+        const apiText = await AsyncStorage.getItem('@API')
+        const apiValue = await AsyncStorage.getItem('@Value')
+       
+        if(apiText !== null && apiValue !== null) {
+          console.warn(HeaderValue)
+          setBaseURL(apiText)
+          setHeaderValue(apiValue)
+        }
+      } catch(e) {
+        // error reading value
+      }
+    }
+    const api = axios.create({
+      baseURL:`${BaseURL}`,
+      headers:{Authorization:`${HeaderValue}`}
+  })
 
   async function setApi() {
     try {
+      const response = await api.get("/ColetaElemento");
       collects.itens.forEach(
         (x) => {
           api.post("/ColetaElemento", {
@@ -31,24 +54,27 @@ export default function Collect(props) {
           });
         }
       );
-      const response = await api.get("/ColetaElemento");
-
+      
+        Vibration.vibrate(200)
       console.log(response.data);
       DelCollect()
       Alert.alert("Lote Enviado", `Lote ${props.nome} enviado com sucesso`);
     } catch (error) {
       console.log("deu erro " + error);
+      Alert.alert("Post não concluido",`Verificar informações da Api em configurações`)
     }
   }
-
+  async function loadCollects(){
+    const realm = await getRealm();
+    let idCollect = props.id;
+    let data = realm.objectForPrimaryKey("Collects",idCollect)
+  setCollects(data)
+}
 
   useEffect(()=>{
-    async function loadCollects(){
-        const realm = await getRealm();
-        let idCollect = props.id;
-        let data = realm.objectForPrimaryKey("Collects",idCollect)
-      setCollects(data)
-    }
+    
+    getData()
+    
 
     loadCollects()
 

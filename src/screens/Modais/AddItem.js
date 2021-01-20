@@ -297,7 +297,7 @@ export default function AddList({ navigation }) {
 const styles = StyleSheet.create({
   overlay: {
     width: "100%",
-    flex: 1,
+    flex: 2,
   },
   container: {
     borderRadius: 10,
