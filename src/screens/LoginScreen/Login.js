@@ -9,12 +9,12 @@ import {
   StyleSheet,
   Animated,
   Alert,
-  Platform
+  Platform,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import getRealm from '../../services/realm';
 import api from '../../services/api';
-import NetInfo from '@react-native-community/netinfo'
+import NetInfo from '@react-native-community/netinfo';
 import styles from './styles';
 
 export default function Login({navigation}) {
@@ -43,117 +43,116 @@ export default function Login({navigation}) {
       }),
     ]).start();
     //consulta no storage
-    getUsuario()
-    connectivity()
-
+    getUsuario();
+    connectivity();
   }, [Condition]);
 
   function connectivity() {
-    if (Platform.OS === "android") {
-      NetInfo.fetch().then(state=>{if(state.isConnected){
-
-        setInternet(true)
-      }
-    else{
-Alert.alert("Desconectado","Você está desconectado a internet")
-setInternet(false)
-    }})
+    if (Platform.OS === 'android') {
+      NetInfo.fetch().then((state) => {
+        if (state.isConnected) {
+          setInternet(true);
+        } else {
+          Alert.alert('Desconectado', 'Você está desconectado a internet');
+          setInternet(false);
+        }
+      });
     } else {
-
-  }}
-
-  async function acessar() {
-   
-    getUsuario();
+    }
   }
 
-  
-  
+  async function acessar() {
+    getUsuario();
+  }
+  async function clearStore() {
+    const realm = await getRealm();
+    const store = realm.objects('User');
+
+    let object = realm.objectForPrimaryKey('User', store[0].id);
+    console.log(object);
+    realm.write(() => {
+      realm.delete(object);
+    });
+  }
   async function getUsuario() {
     try {
-      if(internet==true){
+      if (internet == true) {
+        const response = await api.get('/Acessoappcoleta');
+        const data = response.data.data;
 
-      const response = await api.get('/Acessoappcoleta');
-      const data = response.data.data;
+        const realm = await getRealm();
+        const store = realm.objects('User');
+        console.log("1 Store"+store[0]);
 
-      const realm = await getRealm();
-      const store = realm.objects('User');
-      console.log(store)
+        if (store[0] != undefined) {
+          //Logado
+          if (store[0].logado == true) {
+            const index = data.findIndex(
+              (x) =>
+                x.email == store[0].email &&
+                x.senha == store[0].senha &&
+                x.chave == store[0].token,
+            );
+            console.log("FILTER 1 : "+data[index])
 
-      const indexUsuario = data.findIndex((x) =>(
-        (x.email === email
-          ? email
-          : store[0]?.email&&store[0].logado==true) && 
-        (x.senha === senha
-          ? senha
-          : store[0]?.senha&&store[0].logado==true)
-      )
-      );
-      console.log("DATA"+data[indexUsuario].email)
-      if(store[0]!=undefined){
-        if(data[indexUsuario].email == store[0].email){
-          realm.write(()=>{ 
-            realm.create("User", {id:store[0].id, logado:true}, 'modified')
-          })
-    navigation.navigate('CollectList');
-
-        }else{
-          
-    let object = realm.objectForPrimaryKey("User",store[0].id)
-console.log(object)
-            realm.write(()=>{
-              realm.delete(object)
-            })
-          await setUser(data[indexUsuario]);
-          if (store[0].token == data[indexUsuario].chave) {
-          
-            navigation.navigate('CollectList');
+            if (data[index]) {
+              navigation.navigate('CollectList');
+            } else {
+              clearStore();
+            }
+          } //Deslogado
+          else {
+            const index = data.findIndex(
+              (x) => x.email == email && x.senha == senha
+            );
+            console.log("FILTER 2 : "+data[index])
+            if (data[index]) {
+              clearStore();
+              setUser(data[index]);
+              navigation.navigate('CollectList');
+            } else {
+              Alert.alert(
+                'Email e Senha incorretos',
+                'Verifique o email e senha digitados',
+              );
+            }
           }
-
-        }
-      }
-      else{
-        if(data[indexUsuario]){
-          await setUser(data[indexUsuario]);
-          navigation.navigate('CollectList');
-        }
-
-      }
-
-      
-        
-      
-
-
-    }
-    else{
-      const realm = await getRealm();
-      const store = realm.objects('User');
-      if(store[0].logado == true){
-        dispatch({
-          type: 'USER_LOGGED_IN',
-          payload: [store[0].nome, store[0].email, store[0].senha, store[0].token],
-        });
-        navigation.navigate('CollectList');
-      }else{
-
-        if(store[0].email == email && store[0].senha == senha){
-
-          const realm = await getRealm();
+        } //Sem Storage
+        else {
+          const index = data.findIndex(
+            (x) => ((x.email == email) && (x.senha == senha))
+          );
+          console.log("FILTER INTERNET DESLOGADO : "+data[index].email)
           
-    
-          realm.write(() => {
-            realm.create('User', {id:store[0].id,
-              logado:true
-            },'modified');
-          });
-        navigation.navigate('CollectList');
+          if (data[index]) {
+            setUser(data[index]);
+          } else {
+            Alert.alert(
+              'Email e Senha incorretos',
+              'Verifique o email e senha digitados',
+            );
+          }
+        }
+      } else {
+        const realm = await getRealm();
+        const store = realm.objects('User');
+        if (store[0].logado == true) {
+          navigation.navigate('CollectList');
+        } else {
+          if (store[0].email == email && store[0].senha == senha) {
+            const realm = await getRealm();
 
+            realm.write(() => {
+              realm.create('User', {id: store[0].id, logado: true}, 'modified');
+            });
+            navigation.navigate('CollectList');
+          } else {
+            Alert.alert(
+              'Sem Internet',
+              'Por favor conecte-se a internet para fazer o login de um novo usuário',
+            );
+          }
         }
-        else{
-          Alert.alert("Sem Internet","Por favor conecte-se a internet para fazer o login de um novo usuário")
-        }
-      }
       }
     } catch (error) {
       console.log(error);
@@ -161,18 +160,18 @@ console.log(object)
   }
 
   async function setUser(usuario) {
-    console.log("USUARIO"+ usuario.nomeUsuario)
+    console.log('USUARIO' + usuario.nomeUsuario);
     if (usuario.length != 0) {
       const realm = await getRealm();
 
       realm.write(() => {
-        realm.create("User", {
-          id: Math.random() * 1000,
+        realm.create('User', {
+          id:  parseInt(usuario.id),
           nome: usuario.nomeUsuario,
           email: usuario.email,
           senha: usuario.senha,
           token: usuario.chave,
-          logado:true
+          logado: true,
         });
       });
       dispatch({
@@ -187,6 +186,8 @@ console.log(object)
       setEmail('');
       setSenha('');
     }
+    navigation.navigate('CollectList');
+
   }
 
   return (

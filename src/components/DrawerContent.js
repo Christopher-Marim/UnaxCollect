@@ -34,6 +34,7 @@ export default (props) => {
     
   const realm = await getRealm();
   const store = realm.objects("User");
+  console.warn(store[0].id)
 
     realm.write(()=>{
       realm.create("User",{id:store[0].id, logado:false},'modified')
