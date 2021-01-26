@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   RefreshControl,
-  BackHandler
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch,useSelector } from "react-redux";

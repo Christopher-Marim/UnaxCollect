@@ -4,7 +4,7 @@ import commonStyles from "../../commonStyles";
 
 export default  StyleSheet.create({
     container: {
-        flex: 9,
+        flex:11,
         flexDirection: 'column',
         backgroundColor: '#fff',        
         alignItems: 'stretch',
@@ -29,8 +29,10 @@ export default  StyleSheet.create({
         fontFamily: commonStyles.fontFamily,
         fontWeight: commonStyles.fontWeight,
       },
-     
-   
+      buttonGoBack: {
+        
+        paddingRight:35
+      },
     
       headerView: {
         flex: 1,
@@ -38,16 +40,10 @@ export default  StyleSheet.create({
         paddingHorizontal:20,
         backgroundColor: commonStyles.color.principal,
         alignItems: "center",
-        justifyContent: "space-between",
       },
       text: {
-        fontFamily: commonStyles.fontFamily,
-        fontWeight: commonStyles.fontWeight,
         fontSize: 25,
         color: commonStyles.color.secondary,
-        borderBottomWidth: 2,
-        borderBottomColor: "#FFF",
-        borderBottomLeftRadius: 5,
-        borderBottomRightRadius: 5,
+
       },
 })

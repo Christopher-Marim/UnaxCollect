@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  SafeAreaView,
   Text,
   View,
 } from "react-native";
@@ -35,7 +36,7 @@ export default function MySettings({navigation}) {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
   <EditAPI></EditAPI>
     <View style={styles.headerView}>
         
@@ -45,9 +46,7 @@ export default function MySettings({navigation}) {
           </View>
         </TouchableOpacity>
         <Text style={styles.text}>Configurações</Text>
-      <View style={{paddingRight:30}}>
-
-      </View>
+      
     </View>
     <View style={styles.container}>
     
@@ -73,7 +72,7 @@ export default function MySettings({navigation}) {
     </View>
     <Text style={{...styles.actionText, paddingBottom:10, fontSize:12}}>Version 1.0.0 By ETM Conultoria e Sistemas</Text>
 
-  </View>
+  </SafeAreaView>
 
   );
 }

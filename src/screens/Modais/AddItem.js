@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import commonStyles from "../../commonStyles";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import CheckBox from "@react-native-community/checkbox";
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+
 
 import getRealm from "../../services/realm";
 
@@ -146,7 +148,7 @@ export default function AddList({ navigation }) {
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
-        <View style={styles.container}>
+        <KeyboardAwareScrollView style={styles.container}>
           <Text style={styles.headerModal}>Coletas</Text>
 
           <View>
@@ -285,11 +287,13 @@ export default function AddList({ navigation }) {
               <Text style={styles.button}>Salvar</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </KeyboardAwareScrollView>
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
       </View>
+    
+
     </Modal>
   );
 }
@@ -320,7 +324,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   button: {
-    margin: 20,
     marginRight: 30,
     color: commonStyles.color.today,
   },

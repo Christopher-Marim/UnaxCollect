@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect, useState} from "react";
 import { View,  StyleSheet } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import {
@@ -13,8 +13,34 @@ import {
 } from "react-native-paper";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import commonStyles from '../commonStyles'
+import getRealm from '../services/realm';
+
 
 export default (props) => {
+  useEffect(()=>{
+    async function getUsuarioRealm(){
+  const realm = await getRealm();
+  const store = realm.objects("User");
+  setnome(store[0].nome)
+  setemail(store[0].email)
+    }
+    getUsuarioRealm()
+  },[])
+
+  const [nome, setnome]= useState("Usuário")
+  const [email, setemail]= useState()
+
+  async function Deslogar(){
+    
+  const realm = await getRealm();
+  const store = realm.objects("User");
+
+    realm.write(()=>{
+      realm.create("User",{id:store[0].id, logado:false},'modified')
+    })
+    props.navigation.popToTop()
+  }
+
   return (
     <View style={{flex:1}}>
     <DrawerContentScrollView {...props}>
@@ -22,14 +48,12 @@ export default (props) => {
             <View style={styles.userInfoSection}>
                 <View style={{flexDirection:'row'}}>
                     <Avatar.Image 
-                        source={{
-                            uri: 'https://api.adorable.io/avatars/50/abott@adorable.png'
-                        }}
+                        source={require('../../assets/icon.png')}
                         size={50}
                     />
                     <View style={{marginLeft:15, flexDirection:'column'}}>
-                        <Title style={styles.title}>Christopher Marim</Title>
-                        <Caption style={styles.email}>christopher.marim@etm.srv.br</Caption>
+                        <Title style={styles.title}>{nome}</Title>
+                        <Caption style={styles.email}>{email}</Caption>
                     </View>
                 </View>
 
@@ -57,7 +81,7 @@ export default (props) => {
                         />
                     )}
                     label="Perfil"
-                    onPress={() => {props.navigation.navigate('')}}
+                    onPress={() => {props.navigation.navigate('Profile')}}
                 />
                 <DrawerItem 
                     icon={({color, size}) => (
@@ -106,7 +130,7 @@ export default (props) => {
                 />
             )}
             label="Sair"
-            onPress={() => {props.navigation.navigate("Login")}}
+            onPress={() => { Deslogar()}}
         />
     </Drawer.Section>
 </View>

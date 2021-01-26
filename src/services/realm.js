@@ -8,7 +8,7 @@ export default function getRealm(){
     return (
         Realm.open({
         schema:[CollectsSchema, ItensSchema, UserSchema],
-        schemaVersion: 1,
+        schemaVersion: 5,
     })
     )
 }

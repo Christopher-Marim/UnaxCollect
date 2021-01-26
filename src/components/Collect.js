@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Vibration } from "react-native";
 import moment from "moment";
 import "moment/locale/pt-br";
-import { useSelector, useDispatch } from "react-redux";
+import {useDispatch } from "react-redux";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import commonStyles from "../commonStyles";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -16,7 +16,6 @@ export default function Collect(props) {
   const [borderRadiusCONST, setborderRadius] = useState(10);  
   const [collects, setCollects] = useState([]);
   const [BaseURL, setBaseURL] = useState('');
-  const [HeaderKey, setHeaderKey] = useState('');
   const [HeaderValue, setHeaderValue] = useState('');
   const dispatch = useDispatch();
 
