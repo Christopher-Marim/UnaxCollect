@@ -45,7 +45,7 @@ export default function Login({navigation}) {
     //consulta no storage
     getUsuario();
     connectivity();
-  }, [Condition]);
+  }, []);
 
   function connectivity() {
     if (Platform.OS === 'android') {
@@ -61,7 +61,8 @@ export default function Login({navigation}) {
     }
   }
 
-  async function acessar() {
+   function acessar() {
+    setCondition(true)
     getUsuario();
   }
   async function clearStore() {
@@ -96,7 +97,7 @@ export default function Login({navigation}) {
             console.log("FILTER 1 : "+data[index])
 
             if (data[index]) {
-              navigation.navigate('CollectList');
+              navigation.replace('CollectList');
             } else {
               clearStore();
             }
@@ -109,7 +110,7 @@ export default function Login({navigation}) {
             if (data[index]) {
               clearStore();
               setUser(data[index]);
-              navigation.navigate('CollectList');
+              navigation.replace('CollectList');
             } else {
               Alert.alert(
                 'Email e Senha incorretos',
@@ -119,6 +120,7 @@ export default function Login({navigation}) {
           }
         } //Sem Storage
         else {
+
           const index = data.findIndex(
             (x) => ((x.email == email) && (x.senha == senha))
           );
@@ -131,26 +133,30 @@ export default function Login({navigation}) {
               'Email e Senha incorretos',
               'Verifique o email e senha digitados',
             );
+            
           }
+        
         }
       } else {
         const realm = await getRealm();
         const store = realm.objects('User');
         if (store[0].logado == true) {
-          navigation.navigate('CollectList');
+          navigation.replace('CollectList');
         } else {
-          if (store[0].email == email && store[0].senha == senha) {
-            const realm = await getRealm();
-
-            realm.write(() => {
-              realm.create('User', {id: store[0].id, logado: true}, 'modified');
-            });
-            navigation.navigate('CollectList');
-          } else {
-            Alert.alert(
-              'Sem Internet',
-              'Por favor conecte-se a internet para fazer o login de um novo usuário',
-            );
+          if(Condition==true){
+            if (store[0].email == email && store[0].senha == senha) {
+              const realm = await getRealm();
+  
+              realm.write(() => {
+                realm.create('User', {id: store[0].id, logado: true}, 'modified');
+              });
+              navigation.repalce('CollectList');
+            } else {
+              Alert.alert(
+                'Sem Internet',
+                'Por favor conecte-se a internet para fazer o login de um novo usuário',
+              );
+            }
           }
         }
       }
@@ -186,7 +192,7 @@ export default function Login({navigation}) {
       setEmail('');
       setSenha('');
     }
-    navigation.navigate('CollectList');
+    navigation.replace('CollectList');
 
   }
 

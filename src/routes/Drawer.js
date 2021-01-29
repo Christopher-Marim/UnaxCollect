@@ -16,7 +16,7 @@ export default (props) => {
         drawerContent={props => <DrawerContent {...props}/>}
 
       >
-        <Drawer.Screen name="CollectList" component={CollectList} />
+        <Drawer.Screen name="CollectList" component={CollectList}/>
       </Drawer.Navigator>
     </View>
   );

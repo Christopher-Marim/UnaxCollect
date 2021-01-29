@@ -39,7 +39,7 @@ export default (props) => {
     realm.write(()=>{
       realm.create("User",{id:store[0].id, logado:false},'modified')
     })
-    props.navigation.popToTop()
+    props.navigation.replace("Login")
   }
 
   return (

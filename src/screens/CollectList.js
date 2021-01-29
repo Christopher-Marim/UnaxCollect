@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   RefreshControl,
+  Alert,
+  BackHandler
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch,useSelector } from "react-redux";
@@ -28,6 +30,8 @@ export default function CollectList({ navigation }) {
 
   const [collects, setCollects] = useState([]);
 
+  
+
 
   function callBackFilter(textFilter){
     loadCollects(textFilter)
@@ -44,9 +48,26 @@ export default function CollectList({ navigation }) {
 
 
   useEffect(()=>{
-
     loadCollects()
 
+    const backAction = () => {
+      Alert.alert("Sair", "Deseja sair da aplicação?", [
+        {
+          text: "NÃO",
+          onPress: () => null,
+          style: "cancel"
+        },
+        { text: "SIM", onPress: () => BackHandler.exitApp() }
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
   }, [])
 
   
