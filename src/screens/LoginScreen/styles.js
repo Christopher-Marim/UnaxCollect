@@ -5,7 +5,7 @@ export default  StyleSheet.create({
         flex:1,
         alignItems:'center',
         justifyContent:'center',
-        backgroundColor:'#222222',
+        backgroundColor:'#1A0029',
       },  
       containerLogo:{
         flex:1,
@@ -30,7 +30,7 @@ export default  StyleSheet.create({
     
       },
       btnSubmit:{
-        backgroundColor:'#ba0600',
+        backgroundColor:'#9E00FF',
         width:'90%',
         height:45,
         alignItems:'center',

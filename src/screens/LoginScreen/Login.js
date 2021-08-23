@@ -16,11 +16,13 @@ import getRealm from '../../services/realm';
 import api from '../../services/api';
 import NetInfo from '@react-native-community/netinfo';
 import styles from './styles';
+import {Loader} from '../../components/Loader';
 
 export default function Login({navigation}) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [Condition, setCondition] = useState(false);
+  const [visibleLoader, setVisibleLoader] = useState(false);
   const [internet, setInternet] = useState(null);
   const [offset] = useState(new Animated.ValueXY({x: 0, y: 80}));
   const [opacity] = useState(new Animated.Value(0));
@@ -61,8 +63,8 @@ export default function Login({navigation}) {
     }
   }
 
-   function acessar() {
-    setCondition(true)
+  function acessar() {
+    setCondition(true);
     getUsuario();
   }
   async function clearStore() {
@@ -77,13 +79,14 @@ export default function Login({navigation}) {
   }
   async function getUsuario() {
     try {
+      setVisibleLoader(true);
       if (internet == true) {
         const response = await api.get('/Acessoappcoleta');
         const data = response.data.data;
 
         const realm = await getRealm();
         const store = realm.objects('User');
-        console.log("1 Store"+store[0]);
+        console.log('1 Store' + store[0]);
 
         if (store[0] != undefined) {
           //Logado
@@ -94,7 +97,7 @@ export default function Login({navigation}) {
                 x.senha == store[0].senha &&
                 x.chave == store[0].token,
             );
-            console.log("FILTER 1 : "+data[index])
+            console.log('FILTER 1 : ' + data[index]);
 
             if (data[index]) {
               navigation.replace('CollectList');
@@ -104,9 +107,9 @@ export default function Login({navigation}) {
           } //Deslogado
           else {
             const index = data.findIndex(
-              (x) => x.email == email && x.senha == senha
+              (x) => x.email == email && x.senha == senha,
             );
-            console.log("FILTER 2 : "+data[index])
+            console.log('FILTER 2 : ' + data[index]);
             if (data[index]) {
               clearStore();
               setUser(data[index]);
@@ -120,12 +123,11 @@ export default function Login({navigation}) {
           }
         } //Sem Storage
         else {
-
           const index = data.findIndex(
-            (x) => ((x.email == email) && (x.senha == senha))
+            (x) => x.email == email && x.senha == senha,
           );
-          console.log("FILTER INTERNET DESLOGADO : "+data[index].email)
-          
+          console.log('FILTER INTERNET DESLOGADO : ' + data[index].email);
+
           if (data[index]) {
             setUser(data[index]);
           } else {
@@ -133,9 +135,7 @@ export default function Login({navigation}) {
               'Email e Senha incorretos',
               'Verifique o email e senha digitados',
             );
-            
           }
-        
         }
       } else {
         const realm = await getRealm();
@@ -143,12 +143,16 @@ export default function Login({navigation}) {
         if (store[0].logado == true) {
           navigation.replace('CollectList');
         } else {
-          if(Condition==true){
+          if (Condition == true) {
             if (store[0].email == email && store[0].senha == senha) {
               const realm = await getRealm();
-  
+
               realm.write(() => {
-                realm.create('User', {id: store[0].id, logado: true}, 'modified');
+                realm.create(
+                  'User',
+                  {id: store[0].id, logado: true},
+                  'modified',
+                );
               });
               navigation.repalce('CollectList');
             } else {
@@ -161,19 +165,21 @@ export default function Login({navigation}) {
         }
       }
     } catch (error) {
+      setVisibleLoader(false);
       console.log(error);
+    } finally {
+      setVisibleLoader(false);
     }
   }
 
   async function setUser(usuario) {
-    console.log('USUARIO' + usuario.nomeUsuario);
     if (usuario.length != 0) {
       const realm = await getRealm();
 
       realm.write(() => {
         realm.create('User', {
-          id:  parseInt(usuario.id),
-          nome: usuario.nomeUsuario,
+          id: parseInt(usuario.id),
+          nome: usuario.nomeusuario,
           email: usuario.email,
           senha: usuario.senha,
           token: usuario.chave,
@@ -183,7 +189,7 @@ export default function Login({navigation}) {
       dispatch({
         type: 'USER_LOGGED_IN',
         payload: [
-          usuario.nomeUsuario,
+          usuario.nomeusuario,
           usuario.email,
           usuario.senha,
           usuario.chave,
@@ -193,53 +199,56 @@ export default function Login({navigation}) {
       setSenha('');
     }
     navigation.replace('CollectList');
-
   }
 
   return (
-    <KeyboardAvoidingView style={styles.background}>
-      <View style={styles.containerLogo}>
-        <Image
-          style={{
-            width: 170,
-            height: 170,
-            borderRadius: 10,
-          }}
-          source={require('../../../assets/icon.png')}
-        />
-      </View>
-      <Animated.View
-        style={[
-          styles.container,
-          {
-            opacity: opacity,
-            transform: [{translateY: offset.y}],
-          },
-        ]}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          autoCorrect={false}
-          onChangeText={(text) => setEmail(text)}
-          keyboardType={'email-address'}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          autoCorrect={false}
-          value={senha}
-          onChangeText={(text) => setSenha(text)}
-          secureTextEntry={true}
-        />
+    <>
+      <KeyboardAvoidingView style={styles.background}>
+        <View style={styles.containerLogo}>
+          <Image
+            style={{
+              width: 170,
+              height: 170,
+              borderRadius: 10,
+            }}
+            source={require('../../../assets/icon2.png')}
+          />
+        </View>
 
-        <TouchableOpacity style={styles.btnSubmit} onPress={() => acessar()}>
-          <Text style={styles.submitText}>Acessar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btnSolicit}>
-          <Text style={styles.solicitText}>Solicitar criação de conta</Text>
-        </TouchableOpacity>
-      </Animated.View>
-    </KeyboardAvoidingView>
+        <Animated.View
+          style={[
+            styles.container,
+            {
+              opacity: opacity,
+              transform: [{translateY: offset.y}],
+            },
+          ]}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            autoCorrect={false}
+            onChangeText={(text) => setEmail(text)}
+            keyboardType={'email-address'}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Senha"
+            autoCorrect={false}
+            value={senha}
+            onChangeText={(text) => setSenha(text)}
+            secureTextEntry={true}
+          />
+
+          <TouchableOpacity style={styles.btnSubmit} onPress={() => acessar()}>
+            <Text style={styles.submitText}>Acessar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnSolicit}>
+            <Text style={styles.solicitText}>Solicitar criação de conta</Text>
+          </TouchableOpacity>
+        </Animated.View>
+        {visibleLoader && <Loader />}
+      </KeyboardAvoidingView>
+    </>
   );
 }
