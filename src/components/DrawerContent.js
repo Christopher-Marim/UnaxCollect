@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from "react";
-import { View,  StyleSheet } from "react-native";
+import { View,  StyleSheet, Linking } from "react-native";
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import {
   Avatar,
@@ -7,7 +7,6 @@ import {
   Caption,
   Paragraph,
   Drawer,
-  Text,
   TouchableRipple,
   Switch,
 } from "react-native-paper";
@@ -93,7 +92,7 @@ export default (props) => {
                         />
                     )}
                     label="Bips"
-                    onPress={() => {props.navigation.navigate('')}}
+                    onPress={() => {}}
                 />
                 <DrawerItem 
                     icon={({color, size}) => (
@@ -115,7 +114,7 @@ export default (props) => {
                         />
                     )}
                     label="Support"
-                    onPress={() => {}}
+                    onPress={() => { Linking.openURL('http://www.etm.srv.br/')}}
                 />
             </Drawer.Section>
            

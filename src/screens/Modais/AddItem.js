@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from "react";
-import { useState } from "react";
+import React, {useRef, useEffect} from 'react';
+import {useState} from 'react';
 import {
   View,
   Modal,
@@ -9,24 +9,24 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import commonStyles from "../../commonStyles";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import CheckBox from "@react-native-community/checkbox";
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import commonStyles from '../../commonStyles';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import CheckBox from '@react-native-community/checkbox';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
+import getRealm from '../../services/realm';
+import {ScrollView} from 'react-native-gesture-handler';
 
-import getRealm from "../../services/realm";
-
-export default function AddList({ navigation }) {
-  const [NumberCollectText, setNumberCollectText] = useState("");
+export default function AddList({navigation}) {
+  const [NumberCollectText, setNumberCollectText] = useState('');
   const [CheckBoxCollect, setCheckBoxCollect] = useState(false);
   const [CheckBoxEquipament, setCheckBoxEquipament] = useState(false);
   const [CheckBoxElement, setCheckBoxElement] = useState(false);
-  const [NumberEquipamentText, setNumberEquipamentText] = useState("");
-  const [Element, setElement] = useState("");
-  const [Value, setValue] = useState("");
+  const [NumberEquipamentText, setNumberEquipamentText] = useState('');
+  const [Element, setElement] = useState('');
+  const [Value, setValue] = useState('');
 
   const statusModal = useSelector((state) => state.showModal.showModalADDITEM);
   const idCollect = useSelector((state) => state.collects.currentID);
@@ -34,9 +34,8 @@ export default function AddList({ navigation }) {
   const Condition = useSelector((state) => state.barcodes.callback);
 
   const dispatch = useDispatch();
-  useEffect(()=>{
-
-    if (coleta != undefined && Condition == true&&navigation.isFocused()) {
+  useEffect(() => {
+    if (coleta != undefined && Condition == true && navigation.isFocused()) {
       if (coleta.numberCollect) {
         if (
           (NumberCollectText.length == 0 ||
@@ -46,7 +45,7 @@ export default function AddList({ navigation }) {
           setNumberCollectText(coleta.numberCollect);
         }
       }
-  
+
       if (coleta.numberEquipament) {
         if (
           (NumberEquipamentText.length == 0 ||
@@ -56,7 +55,7 @@ export default function AddList({ navigation }) {
           setNumberEquipamentText(coleta.numberEquipament);
         }
       }
-  
+
       if (coleta.element) {
         if (
           (Element.length == 0 || Element != coleta.element) &&
@@ -65,10 +64,10 @@ export default function AddList({ navigation }) {
           setElement(coleta.element);
         }
       }
-  
-      dispatch({ type: "CALLBACK_CONDITION_FALSE", payload: [false] });
+
+      dispatch({type: 'CALLBACK_CONDITION_FALSE', payload: [false]});
     }
-  },[Condition])
+  }, [Condition]);
 
   const ref_input2 = useRef();
 
@@ -83,10 +82,10 @@ export default function AddList({ navigation }) {
       !Value ||
       !Value.trim()
     ) {
-      Alert.alert("Dados Inválidos", "Quantidade não Informada!");
+      Alert.alert('Dados Inválidos', 'Quantidade não Informada!');
     } else {
       const realm = await getRealm();
-      let data = realm.objectForPrimaryKey("Collects", idCollect);
+      let data = realm.objectForPrimaryKey('Collects', idCollect);
 
       realm.write(() => {
         data.itens.push({
@@ -96,39 +95,39 @@ export default function AddList({ navigation }) {
           element: Element,
           value: Value,
         });
-        dispatch({ type: "REFRESH", payload: [true] });
+        dispatch({type: 'REFRESH', payload: [true]});
         setInterval(() => {
-          dispatch({ type: "REFRESH", payload: [false] });
+          dispatch({type: 'REFRESH', payload: [false]});
         }, 1000);
       });
 
       clearInput();
-      dispatch({ type: "REFRESH", payload: [true] });
+      dispatch({type: 'REFRESH', payload: [true]});
       setInterval(() => {
-        dispatch({ type: "REFRESH", payload: [false] });
+        dispatch({type: 'REFRESH', payload: [false]});
       }, 1000);
     }
   }
-  
+
   function clearInput() {
     if (CheckBoxCollect == false) {
-      setNumberCollectText("");
+      setNumberCollectText('');
     }
 
     if (CheckBoxEquipament == false) {
-      setNumberEquipamentText("");
+      setNumberEquipamentText('');
     }
     if (CheckBoxElement == false) {
-      setElement("");
+      setElement('');
     }
     setValue();
   }
   function closeModal() {
-    dispatch({ type: "SHOW_MODAL_ADDITEM_OFF" });
-    dispatch({ type: "SET_BARCODE", payload: [{}] });
+    dispatch({type: 'SHOW_MODAL_ADDITEM_OFF'});
+    dispatch({type: 'SET_BARCODE', payload: [{}]});
 
     clearInput();
-    navigation.navigate("ItemList");
+    navigation.navigate('ItemList');
   }
 
   return (
@@ -136,44 +135,54 @@ export default function AddList({ navigation }) {
       transparent={true}
       visible={statusModal}
       onRequestClose={closeModal}
-      animationType="fade"
-    >
+      animationType="fade">
       <View
         style={{
           flex: 1,
-          backgroundColor: "rgba(0,0,0,0.6)",
-          alignItems: "center",
-        }}
-      >
+          backgroundColor: 'rgba(0,0,0,0.6)',
+          alignItems: 'center',
+        }}>
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
-        <KeyboardAwareScrollView style={styles.container}>
-          <Text style={styles.headerModal}>Coletas</Text>
+        <View style={styles.wrapperHeader}>
+          <View />
+          <Text style={styles.textHeader}>Coletas</Text>
 
+          <TouchableOpacity
+            style={styles.buttonOpenScanner}
+            onPress={() => {
+              navigation.navigate('Scanner'), clearInput();
+              dispatch({type: 'SET_BARCODE', payload: [{}]});
+
+              dispatch({type: 'SHOW_MODAL_ADDITEM_OFF'});
+            }}>
+            <FontAwesome name="qrcode" size={45} color="white"></FontAwesome>
+          </TouchableOpacity>
+        </View>
+
+        <KeyboardAwareScrollView style={styles.container}>
           <View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 paddingHorizontal: 20,
-              }}
-            >
+              }}>
               <Text style={styles.text}>Número da Coleta</Text>
-              <View
+              <TouchableOpacity
+              onPress={() => setCheckBoxCollect(!CheckBoxCollect)}
                 style={{
                   paddingTop: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
                 <CheckBox
                   value={CheckBoxCollect}
-                  onValueChange={(value) => setCheckBoxCollect(value)}
-                ></CheckBox>
+                 ></CheckBox>
                 <Text style={styles.checkBoxText}>Manter Valor</Text>
-              </View>
+              </TouchableOpacity>
             </View>
             <TextInput
               style={styles.input}
@@ -187,26 +196,24 @@ export default function AddList({ navigation }) {
           <View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 paddingHorizontal: 20,
-              }}
-            >
+              }}>
               <Text style={styles.text}>Número do Equipamento</Text>
-              <View
+              <TouchableOpacity
+              onPress={() => setCheckBoxEquipament(!CheckBoxEquipament)}
                 style={{
                   paddingTop: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
                 <CheckBox
                   value={CheckBoxEquipament}
-                  onValueChange={(value) => setCheckBoxEquipament(value)}
-                ></CheckBox>
+                 ></CheckBox>
                 <Text style={styles.checkBoxText}>Manter Valor</Text>
-              </View>
+              </TouchableOpacity>
             </View>
 
             <TextInput
@@ -219,43 +226,27 @@ export default function AddList({ navigation }) {
             />
           </View>
 
-          <View style={styles.buttonOpenScanner}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate("Scanner"), clearInput();
-                dispatch({ type: "SET_BARCODE", payload: [{}] });
-
-                dispatch({ type: "SHOW_MODAL_ADDITEM_OFF" });
-              }}
-            >
-              <View>
-                <FontAwesome name="qrcode" size={45} color="white"></FontAwesome>
-              </View>
-            </TouchableOpacity>
-          </View>
           <View>
             <View
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
                 paddingHorizontal: 20,
-              }}
-            >
+              }}>
               <Text style={styles.text}>Elemento</Text>
-              <View
+              <TouchableOpacity
+              onPress={() => setCheckBoxElement(!CheckBoxElement)}
                 style={{
                   paddingTop: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
                 <CheckBox
                   value={CheckBoxElement}
-                  onValueChange={(value) => setCheckBoxElement(value)}
-                ></CheckBox>
+                 ></CheckBox>
                 <Text style={styles.checkBoxText}>Manter Valor</Text>
-              </View>
+              </TouchableOpacity>
             </View>
 
             <TextInput
@@ -268,7 +259,7 @@ export default function AddList({ navigation }) {
             />
           </View>
           <View>
-            <Text style={[styles.text, { paddingLeft: 20 }]}>Valor</Text>
+            <Text style={[styles.text, {paddingLeft: 20}]}>Valor</Text>
             <TextInput
               style={styles.input}
               ref={ref_input2}
@@ -292,36 +283,43 @@ export default function AddList({ navigation }) {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
       </View>
-    
-
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
-    width: "100%",
+    width: '100%',
     flex: 2,
   },
   container: {
-    borderRadius: 10,
-    backgroundColor: "#FFF",
-    width: "95%",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    backgroundColor: '#FFF',
+    height: '45%',
+    width: '95%',
   },
-  headerModal: {
+  textHeader: {
     fontFamily: commonStyles.fontFamily,
     fontWeight: commonStyles.fontWeight,
-    backgroundColor: commonStyles.color.principal,
     color: commonStyles.color.secondary,
     fontSize: 18,
-    textAlign: "center",
-    padding: 18,
+    textAlign: 'center',
+    marginLeft:50
+  },
+  wrapperHeader: {
+    padding: 10,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
+    backgroundColor: commonStyles.color.principal,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '95%',
   },
   buttons: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   button: {
     marginRight: 30,
@@ -335,9 +333,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     margin: 15,
     borderBottomWidth: 2,
-    borderColor: "grey",
+    borderColor: 'grey',
     borderRadius: 6,
-    backgroundColor: "#f1f2f4",
+    backgroundColor: '#f1f2f4',
   },
   text: {
     marginTop: 10,
@@ -352,21 +350,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   buttonOpenScanner: {
-    position: "absolute",
-    right: 10,
-    height: 60,
-    width: 50,
     borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonOpenScanner2: {
-    position: "absolute",
+    position: 'absolute',
     right: 10,
     height: 240,
     width: 50,
     borderRadius: 25,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -124,9 +124,6 @@ export default function Collect(props) {
     refresh()
     
   }
-  
-
-
 
   const getRightContent = () => {
     return (
@@ -195,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexWrap: "wrap",
     paddingVertical: 10,
-    width: 190,
+    width: '100%',
     borderRadius: 5,
     borderLeftColor: commonStyles.color.principal,
     backgroundColor: "white",

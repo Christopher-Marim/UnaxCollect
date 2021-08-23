@@ -171,12 +171,4 @@ const styles = StyleSheet.create({
   container2: {
     flex: 1,
   },
-  flatList: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
-    borderBottomWidth: 1,
-    backgroundColor: "#F0F0FA",
-    borderRadius: 5,
-  },
 });
