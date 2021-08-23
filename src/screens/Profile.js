@@ -124,7 +124,7 @@ export default function Profile(props) {
       </View>
       <Image
         style={styles.avatar}
-        source={require('../../assets/icon.png')}
+        source={require('../../assets/icon2.png')}
       />
       <View style={styles.body}>
         <View style={styles.bodyContent}>

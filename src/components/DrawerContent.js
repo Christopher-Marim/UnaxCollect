@@ -48,7 +48,7 @@ export default (props) => {
             <View style={styles.userInfoSection}>
                 <View style={{flexDirection:'row'}}>
                     <Avatar.Image 
-                        source={require('../../assets/icon.png')}
+                        source={require('../../assets/icon2.png')}
                         size={50}
                     />
                     <View style={{marginLeft:15, flexDirection:'column'}}>
