@@ -1,6 +1,6 @@
 {
   "main": "index.js",
-  "name": "ColetaDeAnaliseStorage",
+  "name": "LabCollect",
   "version": "0.0.1",
   "private": true,
   "scripts": {
