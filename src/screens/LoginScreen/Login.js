@@ -81,38 +81,32 @@ export default function Login({navigation}) {
     try {
       setVisibleLoader(true);
       if (internet == true) {
-        const response = await api.get('/Acessoappcoleta');
-        const data = response.data.data;
+        const response2 = await api.get(
+          `/Acessoappcoleta?method=loadAll&usuarioApp=${email}&senhaApp=${senha}`,
+        );
+        const user = response2.data.data[0];
 
         const realm = await getRealm();
         const store = realm.objects('User');
-        console.log('1 Store' + store[0]);
 
         if (store[0] != undefined) {
           //Logado
           if (store[0].logado == true) {
-            const index = data.findIndex(
-              (x) =>
-                x.email == store[0].email &&
-                x.senha == store[0].senha &&
-                x.chave == store[0].token,
-            );
-            console.log('FILTER 1 : ' + data[index]);
-
-            if (data[index]) {
+            if (
+              user.email == store[0].email &&
+              user.senha == store[0].senha &&
+              user.token == store[0].token
+            ) {
+              
               navigation.replace('CollectList');
             } else {
               clearStore();
             }
           } //Deslogado
           else {
-            const index = data.findIndex(
-              (x) => x.email == email && x.senha == senha,
-            );
-            console.log('FILTER 2 : ' + data[index]);
-            if (data[index]) {
+            if (user) {
               clearStore();
-              setUser(data[index]);
+              setUser(user);
               navigation.replace('CollectList');
             } else {
               Alert.alert(
@@ -121,26 +115,19 @@ export default function Login({navigation}) {
               );
             }
           }
-        } //Sem Storage
-        else {
-          const index = data.findIndex(
-            (x) => x.email == email && x.senha == senha,
-          );
-          console.log('FILTER INTERNET DESLOGADO : ' + data[index].email);
+        }else {
+          if(user){
+           await setUser(user)
+            navigation.replace('CollectList');
 
-          if (data[index]) {
-            setUser(data[index]);
-          } else {
-            Alert.alert(
-              'Email e Senha incorretos',
-              'Verifique o email e senha digitados',
-            );
           }
-        }
+        } //Sem internet
       } else {
         const realm = await getRealm();
         const store = realm.objects('User');
         if (store[0].logado == true) {
+          console.log("DALE3");
+
           navigation.replace('CollectList');
         } else {
           if (Condition == true) {
@@ -184,6 +171,8 @@ export default function Login({navigation}) {
           senha: usuario.senha,
           token: usuario.chave,
           logado: true,
+          system_user_id: usuario.system_user_id,
+          system_unit_id: usuario.system_unit_id,
         });
       });
       dispatch({
@@ -193,6 +182,8 @@ export default function Login({navigation}) {
           usuario.email,
           usuario.senha,
           usuario.chave,
+          usuario.system_user_id,
+          usuario.system_unit_id,
         ],
       });
       setEmail('');

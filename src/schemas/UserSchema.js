@@ -7,7 +7,9 @@ export default UserSchema = {
       email: "string",
       senha: "string",
       token:"string",
-      logado:'bool'
+      logado:'bool',
+      system_user_id:'string',
+      system_unit_id:'string'
     },
   };
   
