@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import getRealm from '../services/realm';
-import { API } from '../../commonsVariables';
+import {API} from '../../commonsVariables';
 
 export default function Collect(props) {
   const [borderRadiusCONST, setborderRadius] = useState(10);
@@ -27,15 +27,15 @@ export default function Collect(props) {
   const [HeaderValue, setHeaderValue] = useState('');
   const dispatch = useDispatch();
 
-  async function getUsuarioRealm() {
+  const getUsuarioRealm = useCallback(async()=>{
     const realm = await getRealm();
     const store = realm.objects('User');
     setUser(store[0]);
-  }
+  }, []) 
 
   useEffect(() => {
     getUsuarioRealm();
-  }, []);
+  }, [getUsuarioRealm]);
 
   const formatteddate = (collects) =>
     moment(collects.dateAt).locale('pt-br').format('D/MM/YYYY');
@@ -65,8 +65,8 @@ export default function Collect(props) {
   async function setApi() {
     console.log(user);
     try {
-      collects.itens.forEach((x) => {
-        api.post('/ColetaElemento', {
+      collects.itens.forEach(async (x) => {
+        await api.post('/coletaelementos', {
           coletaid: x.numberCollect,
           elementoid: x.element,
           valor: x.value,
@@ -80,7 +80,7 @@ export default function Collect(props) {
       Alert.alert('Lote Enviado', `Lote ${props.nome} enviado com sucesso`);
     } catch (error) {
       Alert.alert(
-        'Post não concluido',
+        'Post não concluído',
         `Verificar informações da Api em configurações, error: ${error}`,
       );
     }
@@ -208,6 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderLeftColor: commonStyles.color.principal,
     backgroundColor: 'white',
+    elevation: 2,
   },
   textCollect: {
     flex: 1,

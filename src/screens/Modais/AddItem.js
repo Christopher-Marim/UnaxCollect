@@ -89,7 +89,7 @@ export default function AddList({navigation}) {
 
       realm.write(() => {
         data.itens.push({
-          id: Math.random() * 1000,
+          id: Date.now(),
           numberCollect: NumberCollectText,
           numberEquipament: NumberEquipamentText,
           element: Element,
@@ -152,7 +152,7 @@ export default function AddList({navigation}) {
           <TouchableOpacity
             style={styles.buttonOpenScanner}
             onPress={() => {
-              navigation.navigate('Scanner'), clearInput();
+              navigation.navigate('Scanner');
               dispatch({type: 'SET_BARCODE', payload: [{}]});
 
               dispatch({type: 'SHOW_MODAL_ADDITEM_OFF'});
@@ -161,113 +161,140 @@ export default function AddList({navigation}) {
           </TouchableOpacity>
         </View>
 
-        <KeyboardAwareScrollView style={styles.container}>
+        <View style={styles.container}>
           <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 20,
-              }}>
-              <Text style={styles.text}>Número da Coleta</Text>
-              <TouchableOpacity
-              onPress={() => setCheckBoxCollect(!CheckBoxCollect)}
+            <View>
+              <View
                 style={{
-                  paddingTop: 10,
                   flexDirection: 'row',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 20,
                 }}>
-                <CheckBox
-                  value={CheckBoxCollect}
-                 ></CheckBox>
-                <Text style={styles.checkBoxText}>Manter Valor</Text>
-              </TouchableOpacity>
+                <Text style={styles.text}>Número da Coleta</Text>
+                <TouchableOpacity
+                  onPress={() => setCheckBoxCollect(!CheckBoxCollect)}
+                  style={{
+                    paddingTop: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  {CheckBoxCollect ? (
+                    <FontAwesome
+                      name="check-square-o"
+                      size={23}
+                      color="green"></FontAwesome>
+                  ) : (
+                    <FontAwesome
+                      name="square-o"
+                      size={23}
+                      color="black"></FontAwesome>
+                  )}
+                  <Text style={styles.checkBoxText}>Manter Valor</Text>
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                style={styles.input}
+                ref={ref_input2}
+                placeholder="Collect Number"
+                onChangeText={(text) => setNumberCollectText(text)}
+                value={NumberCollectText}
+                keyboardType="number-pad"
+              />
             </View>
-            <TextInput
-              style={styles.input}
-              ref={ref_input2}
-              placeholder="Collect Number"
-              onChangeText={(text) => setNumberCollectText(text)}
-              value={NumberCollectText}
-              keyboardType="number-pad"
-            />
-          </View>
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 20,
-              }}>
-              <Text style={styles.text}>Número do Equipamento</Text>
-              <TouchableOpacity
-              onPress={() => setCheckBoxEquipament(!CheckBoxEquipament)}
+
+            <View>
+              <View
                 style={{
-                  paddingTop: 10,
                   flexDirection: 'row',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 20,
                 }}>
-                <CheckBox
-                  value={CheckBoxEquipament}
-                 ></CheckBox>
-                <Text style={styles.checkBoxText}>Manter Valor</Text>
-              </TouchableOpacity>
+                <Text style={styles.text}>Número do Equipamento</Text>
+                <TouchableOpacity
+                  onPress={() => setCheckBoxEquipament(!CheckBoxEquipament)}
+                  style={{
+                    paddingTop: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  {CheckBoxEquipament ? (
+                    <FontAwesome
+                      name="check-square-o"
+                      size={23}
+                      color="green"></FontAwesome>
+                  ) : (
+                    <FontAwesome
+                      name="square-o"
+                      size={23}
+                      color="black"></FontAwesome>
+                  )}
+                  <Text style={styles.checkBoxText}>Manter Valor</Text>
+                </TouchableOpacity>
+              </View>
+
+              <TextInput
+                style={styles.input}
+                ref={ref_input2}
+                placeholder="Equipament Number"
+                onChangeText={(text) => setNumberEquipamentText(text)}
+                value={NumberEquipamentText}
+                keyboardType="default"
+              />
             </View>
 
-            <TextInput
-              style={styles.input}
-              ref={ref_input2}
-              placeholder="Equipament Number"
-              onChangeText={(text) => setNumberEquipamentText(text)}
-              value={NumberEquipamentText}
-              keyboardType="default"
-            />
-          </View>
-
-          <View>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal: 20,
-              }}>
-              <Text style={styles.text}>Elemento</Text>
-              <TouchableOpacity
-              onPress={() => setCheckBoxElement(!CheckBoxElement)}
+            <View>
+              <View
                 style={{
-                  paddingTop: 10,
                   flexDirection: 'row',
                   alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 20,
                 }}>
-                <CheckBox
-                  value={CheckBoxElement}
-                 ></CheckBox>
-                <Text style={styles.checkBoxText}>Manter Valor</Text>
-              </TouchableOpacity>
-            </View>
+                <Text style={styles.text}>Elemento</Text>
+                <TouchableOpacity
+                  onPress={() => setCheckBoxElement(!CheckBoxElement)}
+                  style={{
+                    paddingTop: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  {CheckBoxElement ? (
+                    <FontAwesome
+                      name="check-square-o"
+                      size={23}
+                      color="green"></FontAwesome>
+                  ) : (
+                    <FontAwesome
+                      name="square-o"
+                      size={23}
+                      color="black"></FontAwesome>
+                  )}
+                  <Text style={styles.checkBoxText}>Manter Valor</Text>
+                </TouchableOpacity>
+              </View>
 
-            <TextInput
-              style={styles.input}
-              ref={ref_input2}
-              placeholder="Element"
-              onChangeText={(text) => setElement(text)}
-              value={Element}
-              keyboardType="default"
-            />
-          </View>
-          <View>
-            <Text style={[styles.text, {paddingLeft: 20}]}>Valor</Text>
-            <TextInput
-              style={styles.input}
-              ref={ref_input2}
-              placeholder="Value"
-              onChangeText={(text) => setValue(text)}
-              value={Value}
-              keyboardType="default"
-            />
+              <TextInput
+                style={styles.input}
+                ref={ref_input2}
+                placeholder="Element"
+                onChangeText={(text) => setElement(text)}
+                value={Element}
+                keyboardType="default"
+              />
+            </View>
+            <View>
+              <Text style={[styles.text, {paddingLeft: 20}]}>Valor</Text>
+              <TextInput
+                style={styles.input}
+                ref={ref_input2}
+                placeholder="Value"
+                onChangeText={(text) => setValue(text)}
+                value={Value}
+                keyboardType="default"
+              />
+            </View>
           </View>
 
           <View style={styles.buttons}>
@@ -278,7 +305,7 @@ export default function AddList({navigation}) {
               <Text style={styles.button}>Salvar</Text>
             </TouchableOpacity>
           </View>
-        </KeyboardAwareScrollView>
+        </View>
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
@@ -293,11 +320,13 @@ const styles = StyleSheet.create({
     flex: 2,
   },
   container: {
+    flex: 1,
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     backgroundColor: '#FFF',
-    height: '45%',
-    width: '95%',
+    justifyContent: 'space-between',
+    minHeight: '90%',
+    width: '100%',
   },
   textHeader: {
     fontFamily: commonStyles.fontFamily,
@@ -305,7 +334,7 @@ const styles = StyleSheet.create({
     color: commonStyles.color.secondary,
     fontSize: 18,
     textAlign: 'center',
-    marginLeft:50
+    marginLeft: 50,
   },
   wrapperHeader: {
     padding: 10,
@@ -315,14 +344,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: '95%',
+    width: '100%',
   },
   buttons: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   button: {
-    marginRight: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    marginHorizontal: 20,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderRadius: 10,
     color: commonStyles.color.today,
   },
   input: {
@@ -345,6 +379,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   checkBoxText: {
+    marginLeft: 15,
     fontFamily: commonStyles.fontFamily,
     fontWeight: commonStyles.fontWeight,
     fontSize: 14,

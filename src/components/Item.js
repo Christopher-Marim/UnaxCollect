@@ -128,6 +128,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderLeftColor: commonStyles.color.principal,
     backgroundColor: "white",
+    elevation:2
   },
   textCollect: {
     flex: 1,

@@ -6,10 +6,10 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
-  StyleSheet,
   Animated,
   Alert,
   Platform,
+  Dimensions,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import getRealm from '../../services/realm';
@@ -18,10 +18,9 @@ import NetInfo from '@react-native-community/netinfo';
 import styles from './styles';
 import {Loader} from '../../components/Loader';
 
-export default function Login({navigation}) {
+export default function Login({navigation, route}) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
-  const [Condition, setCondition] = useState(false);
   const [visibleLoader, setVisibleLoader] = useState(false);
   const [internet, setInternet] = useState(null);
   const [offset] = useState(new Animated.ValueXY({x: 0, y: 80}));
@@ -45,11 +44,11 @@ export default function Login({navigation}) {
       }),
     ]).start();
     //consulta no storage
-    getUsuario();
     connectivity();
-  }, []);
+    getUsuario();
+  },[]);
 
-  function connectivity() {
+   function connectivity() {
     if (Platform.OS === 'android') {
       NetInfo.fetch().then((state) => {
         if (state.isConnected) {
@@ -59,12 +58,10 @@ export default function Login({navigation}) {
           setInternet(false);
         }
       });
-    } else {
     }
   }
 
   function acessar() {
-    setCondition(true);
     getUsuario();
   }
   async function clearStore() {
@@ -72,7 +69,6 @@ export default function Login({navigation}) {
     const store = realm.objects('User');
 
     let object = realm.objectForPrimaryKey('User', store[0].id);
-    console.log(object);
     realm.write(() => {
       realm.delete(object);
     });
@@ -82,7 +78,7 @@ export default function Login({navigation}) {
       setVisibleLoader(true);
       if (internet == true) {
         const response2 = await api.get(
-          `/Acessoappcoleta?method=loadAll&usuarioApp=${email}&senhaApp=${senha}`,
+          `/acessoapp?method=loadAll&usuarioApp=${email}&senhaApp=${senha}`,
         );
         const user = response2.data.data[0];
 
@@ -91,7 +87,7 @@ export default function Login({navigation}) {
 
         if (store[0] != undefined) {
           //Logado
-          if (store[0].logado == true) {
+          if (store[0]?.logado == true) {
             if (
               user.email == store[0].email &&
               user.senha == store[0].senha &&
@@ -125,29 +121,11 @@ export default function Login({navigation}) {
       } else {
         const realm = await getRealm();
         const store = realm.objects('User');
-        if (store[0].logado == true) {
-          console.log("DALE3");
-
-          navigation.replace('CollectList');
-        } else {
-          if (Condition == true) {
-            if (store[0].email == email && store[0].senha == senha) {
-              const realm = await getRealm();
-
-              realm.write(() => {
-                realm.create(
-                  'User',
-                  {id: store[0].id, logado: true},
-                  'modified',
-                );
-              });
-              navigation.repalce('CollectList');
-            } else {
-              Alert.alert(
-                'Sem Internet',
-                'Por favor conecte-se a internet para fazer o login de um novo usuário',
-              );
-            }
+        if(store[0]){
+          if (store[0]?.logado == true) {
+            navigation.replace('CollectList');
+          } else {
+            Alert.alert('Erro ao conectar', 'Esteja conectado a internet para fazer login')
           }
         }
       }
@@ -166,8 +144,8 @@ export default function Login({navigation}) {
       realm.write(() => {
         realm.create('User', {
           id: parseInt(usuario.id),
-          nome: usuario.nomeusuario,
-          email: usuario.email,
+          nome: usuario.nome,
+          email: usuario.login,
           senha: usuario.senha,
           token: usuario.chave,
           logado: true,
@@ -178,8 +156,8 @@ export default function Login({navigation}) {
       dispatch({
         type: 'USER_LOGGED_IN',
         payload: [
-          usuario.nomeusuario,
-          usuario.email,
+          usuario.nome,
+          usuario.login,
           usuario.senha,
           usuario.chave,
           usuario.system_user_id,
@@ -198,8 +176,8 @@ export default function Login({navigation}) {
         <View style={styles.containerLogo}>
           <Image
             style={{
-              width: 170,
-              height: 170,
+              width: Dimensions.get('window').width/2.5,
+              height: Dimensions.get('window').width/2.5,
               borderRadius: 10,
             }}
             source={require('../../../assets/icon2.png')}

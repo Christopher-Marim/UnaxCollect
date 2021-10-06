@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -20,8 +20,10 @@ import commonStyles from '../commonStyles';
 import Collect from '../components/Collect';
 import EditCollect from '../screens/Modais/EditCollect';
 import getRealm from '../services/realm';
+import {useFocusEffect} from '@react-navigation/native';
 
-export default function CollectList({navigation}) {
+export default function CollectList({navigation, route}) {
+  const [collects, setCollects] = useState([]);
   const refresh = useSelector((state) => state.collects.refresh);
   const statusModal = useSelector(
     (state) => state.showModal.showModalFILTERCOLLECT,
@@ -29,46 +31,51 @@ export default function CollectList({navigation}) {
 
   const dispatch = useDispatch();
 
-  const [collects, setCollects] = useState([]);
-
   function callBackFilter(textFilter) {
     loadCollects(textFilter);
     onRefresh();
   }
 
-  async function loadCollects(textFilter = '') {
-    const realm = await getRealm();
+  const loadCollects = useCallback(
+    async (textFilter = '') => {
+      const realm = await getRealm();
 
-    const data = realm
-      .objects('Collects')
-      .sorted('dateAt')
-      .filtered(`nome CONTAINS[c] "${textFilter}" `);
+      const data = realm
+        .objects('Collects')
+        .sorted('dateAt')
+        .filtered(`nome CONTAINS[c] "${textFilter}" `);
 
-    setCollects(data);
-  }
+      setCollects(data?data:[]);
+    },
+    [loadCollects],
+  );
 
   useEffect(() => {
     loadCollects();
+  }, [loadCollects]);
 
-    const backAction = () => {
-      Alert.alert('Sair', 'Deseja sair da aplicação?', [
+  function onBackPress() {
+    if (route.name === 'CollectList') {
+      Alert.alert('Espere', 'Deseja mesmo sair da aplicação?', [
         {
-          text: 'NÃO',
+          text: 'Cancelar',
           onPress: () => null,
           style: 'cancel',
         },
-        {text: 'SIM', onPress: () => BackHandler.exitApp()},
+        {text: 'Sim', onPress: () => BackHandler.exitApp()},
       ]);
       return true;
-    };
+    }
+  }
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
+  useFocusEffect(
+    useCallback(() => {
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-    return () => backHandler.remove();
-  }, []);
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [onBackPress]),
+  );
 
   const onRefresh = () => {
     dispatch({type: 'REFRESH', payload: [true]});
@@ -92,8 +99,7 @@ export default function CollectList({navigation}) {
             <FontAwesome name="bars" size={30} color="white"></FontAwesome>
           </View>
         </TouchableOpacity>
-        <Text style={styles.Text}>Unax</Text>
-
+        <Text style={styles.Text}>Coletas</Text>
         <TouchableOpacity
           style={styles.buttonFilter}
           onPress={() => {
@@ -164,7 +170,7 @@ const styles = StyleSheet.create({
   headerView: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    height: Dimensions.get('window').height *0.08,
+    height: Dimensions.get('window').height * 0.08,
     backgroundColor: commonStyles.color.principal,
     alignItems: 'center',
     justifyContent: 'space-between',
